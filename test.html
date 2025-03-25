@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Student Registration</title>
+    <style>
+        .error { color: red; margin-top: 10px; }
+        .success { color: green; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Test Student Registration</h2>
+    <form id="studentForm">
+        <div>
+            <label>Name:</label>
+            <input type="text" name="name" value="Test Student" required>
+        </div>
+        <div>
+            <label>Roll Number:</label>
+            <input type="text" name="rollNumber" value="2024001" required>
+        </div>
+        <div>
+            <label>Course:</label>
+            <input type="text" name="course" value="B.Tech" required>
+        </div>
+        <div>
+            <label>Branch:</label>
+            <input type="text" name="branch" value="Computer Science" required>
+        </div>
+        <div>
+            <label>Semester:</label>
+            <input type="number" name="semester" value="1" required>
+        </div>
+        <div>
+            <label>Phone Number:</label>
+            <input type="text" name="phoneNumber" value="1234567890" required>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('studentForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                console.log('Sending request to:', 'http://localhost:8081/api/students/register/basic');
+                console.log('Data:', data);
+                
+                const response = await fetch('http://localhost:8081/api/students/register/basic', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + btoa('user:f8fbf129-f847-4dde-bc27-93902147d228')
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`Server error: ${response.status} - ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('Success response:', result);
+                resultDiv.innerHTML = `<div class="success">Registration successful! Response: ${JSON.stringify(result, null, 2)}</div>`;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        };
+    </script>
+</body>
+</html> 
